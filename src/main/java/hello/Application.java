@@ -15,7 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-
+/*
+	https://auth0.com/blog/securing-spring-boot-with-jwts/
+	https://github.com/auth0-blog/spring-boot-jwts
+	https://github.com/szerhusenBC/jwt-spring-security-demo
+*/
+	
 @SpringBootApplication
 @RestController
 public class Application {
