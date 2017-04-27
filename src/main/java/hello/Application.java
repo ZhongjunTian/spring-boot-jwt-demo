@@ -36,42 +36,6 @@ public class Application {
     public @ResponseBody String hellWorld() {
         return "hello world";
     }
-    @PostMapping("/login")
-    public @ResponseBody String auth(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        AccountCredentials creds = new ObjectMapper()
-                .readValue(request.getInputStream(), AccountCredentials.class);
-        Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        creds.getUsername(),
-                        creds.getPassword(),
-                        Collections.emptyList()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
-
-        return "hello world";
-    }
 
 
-    public class AccountCredentials {
-
-        private String username;
-        private String password;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
 }
