@@ -22,7 +22,7 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
             String username = TokenAuthUtil.parseToken((HttpServletRequest) request);
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList()));
             filterChain.doFilter(request, response);
-        } catch (TokenAuthUtil.TokenException te) {
+        } catch (TokenAuthUtil.TokenValidationException te) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, te.getMessage());
         } catch (Exception e) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "invalid token");

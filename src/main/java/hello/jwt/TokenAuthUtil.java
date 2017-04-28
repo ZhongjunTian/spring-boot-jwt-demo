@@ -1,6 +1,5 @@
 package hello.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.AuthenticationException;
@@ -42,14 +41,14 @@ public class TokenAuthUtil {
                         .getBody();
                 username = (String) (body.get("username"));
             } catch (Exception e) {
-                throw new TokenException(e.getMessage());
+                throw new TokenValidationException(e.getMessage());
             }
         }
         return username;
     }
 
-    static class TokenException extends AuthenticationException {
-        public TokenException(String msg) {
+    static class TokenValidationException extends AuthenticationException {
+        public TokenValidationException(String msg) {
             super(msg);
         }
     }
