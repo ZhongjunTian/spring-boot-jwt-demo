@@ -1,7 +1,6 @@
 package hello;
 
 import hello.jwt.JWTAuthenticationFilter;
-import hello.jwt.JWTLoginFilter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,11 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static hello.Application.LOGIN_PATH;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public static final String LOGIN_PATH = "/login";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -35,14 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                    "/**/*.js"
 //            ).permitAll()
                 .antMatchers(HttpMethod.POST, LOGIN_PATH).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(new JWTLoginFilter(LOGIN_PATH, authenticationManager()),
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JWTAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
-// Call our errorHandler if authentication/authorisation fails
-//      http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
+                .anyRequest().authenticated();
+        http.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //.and()
 

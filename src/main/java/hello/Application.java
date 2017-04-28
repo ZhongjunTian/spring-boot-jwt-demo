@@ -1,20 +1,14 @@
 package hello;
 
 import hello.jwt.TokenAuthUtil;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.Token;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collections;
+
 /*
 	https://auth0.com/blog/securing-spring-boot-with-jwts/
 	https://github.com/auth0-blog/spring-boot-jwts
@@ -29,13 +23,38 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     @GetMapping("/hello")
-    public @ResponseBody String hellWorld() {
+    public @ResponseBody Object hellWorld() {
         return "hello world";
     }
 
+    public static final String LOGIN_PATH = "/login";
+    @PostMapping(LOGIN_PATH)
+    public void auth(HttpServletRequest request, HttpServletResponse response,
+                                     @RequestBody AccountCredentials credentials) {
+        TokenAuthUtil.addTokenToHeader(response,credentials.getUsername());
+    }
 
+    public static class AccountCredentials {
+        public AccountCredentials() {
+        }
+        private String username;
+        private String password;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
 }

@@ -1,9 +1,8 @@
 package hello.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,46 +11,41 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
-
 public class TokenAuthUtil {
-    static final long EXPIRATIONTIME = 864_000_000; // 10 days
+    static final long EXPIRATION_TIME = 864_000_000; // 10 days
     static final String SECRET = "ThisIsASecret";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";
+    static final String USER_NAME = "sub";
 
-    static void addTokenToHeader(HttpServletResponse res, String username) {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("sub",username);
+    public static void addTokenToHeader(HttpServletResponse res, String username) {
+        HashMap<String, Object> map = new HashMap<>();
+        //you can put any data in the map
+        map.put("username", username);
         String JWT = Jwts.builder()
-                .setSubject(username)
-//                .setClaims(map)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
+                .setClaims(map)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + JWT);
     }
 
-    static Authentication getAuthentication(HttpServletRequest request) {
+    public static String parseToken(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
+        String username = null;
         if (token != null) {
             // parse the token.
             try {
-                String user = Jwts.parser()
+                Map<String,Object> body = Jwts.parser()
                         .setSigningKey(SECRET)
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-                        .getBody()
-                        .getSubject();
-                if (user != null) {
-                    return new UsernamePasswordAuthenticationToken(user, null, emptyList());
-                }else{
-                    throw new TokenException("Missing user info");
-                }
-            }catch (Exception e){
+                        .getBody();
+                username = (String) (body.get("username"));
+            } catch (Exception e) {
                 throw new TokenException(e.getMessage());
             }
         }
-        throw new TokenException("Token missing or wrong");//failed
+        return username;
     }
 
     static class TokenException extends AuthenticationException {
