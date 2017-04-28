@@ -1,15 +1,12 @@
 package hello.jwt;
 
-import hello.Application;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -19,7 +16,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 import static hello.WebSecurityConfig.LOGIN_PATH;
-import static hello.jwt.TokenAuthUtil.HEADER_STRING;
 
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -78,6 +74,6 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
             HttpServletResponse res, FilterChain chain,
             Authentication auth) throws IOException, ServletException {
         TokenAuthUtil
-                .addAuthentication(res, auth.getName());
+                .addTokenToHeader(res, auth.getName());
     }
 }
