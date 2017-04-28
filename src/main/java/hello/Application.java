@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /*
 	https://auth0.com/blog/securing-spring-boot-with-jwts/
@@ -30,9 +31,15 @@ public class Application {
 
     public static final String LOGIN_PATH = "/login";
     @PostMapping(LOGIN_PATH)
-    public void auth(HttpServletRequest request, HttpServletResponse response,
-                                     @RequestBody AccountCredentials credentials) {
-        TokenAuthUtil.addTokenToHeader(response,credentials.getUsername());
+    public void login(HttpServletRequest request, HttpServletResponse response,
+                                     @RequestBody AccountCredentials credentials) throws IOException {
+        //here we just have one hardcoded username=admin and password=admin
+        //TODO add your own user validation code here
+        if("admin".equals(credentials.username)
+                && "admin".equals(credentials.password))
+            TokenAuthUtil.addTokenToHeader(response,credentials.getUsername());
+        else
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
     }
 
     public static class AccountCredentials {
