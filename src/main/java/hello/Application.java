@@ -24,7 +24,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @GetMapping("/hello")
+    @GetMapping("/demo")
     public @ResponseBody Object hellWorld() {
         return "hello world";
     }
