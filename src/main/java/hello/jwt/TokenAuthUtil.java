@@ -40,11 +40,12 @@ public class TokenAuthUtil {
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
                 username = (String) (body.get("username"));
+                return username;
             } catch (Exception e) {
                 throw new TokenValidationException(e.getMessage());
             }
         }
-        return username;
+        throw new TokenValidationException("Wrong token");
     }
 
     static class TokenValidationException extends AuthenticationException {
