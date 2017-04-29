@@ -20,7 +20,8 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
             throws IOException, ServletException {
         try {
             String username = TokenAuthUtil.parseToken((HttpServletRequest) request);
-            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList()));
+            if (username != null)
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList()));
             filterChain.doFilter(request, response);
         } catch (TokenAuthUtil.TokenValidationException te) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, te.getMessage());
