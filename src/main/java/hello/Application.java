@@ -1,9 +1,11 @@
 package hello;
 
+import hello.jwt.JwtAuthenticationFilter;
 import hello.jwt.TokenAuthUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.core.token.Token;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,48 +22,41 @@ import java.io.IOException;
 @RestController
 public class Application {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
     @GetMapping("/demo")
     public @ResponseBody Object hellWorld() {
         return "hello world";
     }
 
+
+    @Bean
+    public FilterRegistrationBean jwtFilter() {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        filter.setExcludeUrlPatterns("/*.html", "/", "/login");
+        registrationBean.setFilter(filter);
+        return registrationBean;
+    }
+
+
     public static final String LOGIN_PATH = "/login";
     @PostMapping(LOGIN_PATH)
     public void login(HttpServletRequest request, HttpServletResponse response,
-                                     @RequestBody AccountCredentials credentials) throws IOException {
+                                     @RequestBody final AccountCredentials credentials) throws IOException {
         //here we just have one hardcoded username=admin and password=admin
         //TODO add your own user validation code here
         if("admin".equals(credentials.username)
                 && "admin".equals(credentials.password))
-            TokenAuthUtil.addTokenToHeader(response,credentials.getUsername());
+            TokenAuthUtil.addTokenToHeader(response,credentials.username);
         else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
     }
 
+
     public static class AccountCredentials {
-        public AccountCredentials() {
-        }
-        private String username;
-        private String password;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
+        public String username;
+        public String password;
+    }
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 }

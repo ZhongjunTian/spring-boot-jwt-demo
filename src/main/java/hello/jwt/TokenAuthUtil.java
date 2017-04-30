@@ -2,7 +2,6 @@ package hello.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.AuthenticationException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TokenAuthUtil {
-    static final long EXPIRATION_TIME = 864_000_000; // 10 days
+    static final long EXPIRATION_TIME = 3600_000; // 1 hour
     static final String SECRET = "ThisIsASecret";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";
@@ -40,14 +39,18 @@ public class TokenAuthUtil {
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
                 username = (String) (body.get("username"));
+                if(username == null)
+                    throw new TokenValidationException("Wrong token without username");
             } catch (Exception e) {
                 throw new TokenValidationException(e.getMessage());
             }
+        }else{
+            throw new TokenValidationException("Missing token");
         }
         return username;
     }
 
-    static class TokenValidationException extends AuthenticationException {
+    static class TokenValidationException extends RuntimeException {
         public TokenValidationException(String msg) {
             super(msg);
         }
