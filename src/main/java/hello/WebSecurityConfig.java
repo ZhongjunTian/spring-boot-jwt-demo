@@ -25,15 +25,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 
                 // allow anonymous resource requests
-//            .antMatchers(
-//                    HttpMethod.GET,
-//                    "/",
-//                    "/*.html",
-//                    "/favicon.ico",
-//                    "/**/*.html",
-//                    "/**/*.css",
-//                    "/**/*.js"
-//            ).permitAll()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/",
+                        "/*.html",
+                        "/favicon.ico",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js"
+                ).permitAll()
                 .antMatchers(HttpMethod.POST, LOGIN_PATH).permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
