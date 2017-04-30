@@ -21,10 +21,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String username  = TokenAuthUtil.parseToken(request);
-        } catch (TokenAuthUtil.TokenValidationException te) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, te.getMessage());
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "invalid token");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
         filterChain.doFilter(request, response);
     }

@@ -32,17 +32,13 @@ public class TokenAuthUtil {
         String username = null;
         if (token != null) {
             // parse the token.
-            try {
-                Map<String,Object> body = Jwts.parser()
-                        .setSigningKey(SECRET)
-                        .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-                        .getBody();
-                username = (String) (body.get("username"));
-                if(username == null)
-                    throw new TokenValidationException("Wrong token without username");
-            } catch (Exception e) {
-                throw new TokenValidationException(e.getMessage());
-            }
+            Map<String,Object> body = Jwts.parser()
+                    .setSigningKey(SECRET)
+                    .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+                    .getBody();
+            username = (String) (body.get("username"));
+            if(username == null)
+                throw new TokenValidationException("Wrong token without username");
         }else{
             throw new TokenValidationException("Missing token");
         }
