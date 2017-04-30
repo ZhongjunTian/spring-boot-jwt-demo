@@ -29,20 +29,20 @@ public class TokenAuthUtil {
 
     public static String validateToken(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
-        String username = null;
         if (token != null) {
             // parse the token.
             Map<String,Object> body = Jwts.parser()
                     .setSigningKey(SECRET)
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
-            username = (String) (body.get("username"));
-            if(username == null)
+            String username = (String) (body.get("username"));
+            if(username == null || username.isEmpty())
                 throw new TokenValidationException("Wrong token without username");
+            else
+                return username;
         }else{
             throw new TokenValidationException("Missing token");
         }
-        return username;
     }
 
     static class TokenValidationException extends RuntimeException {
