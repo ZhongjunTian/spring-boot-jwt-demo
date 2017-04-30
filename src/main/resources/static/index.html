@@ -50,7 +50,7 @@
                   headers: {'Authorization': token},
                   method: 'GET'
                 }).always(function(data, status, xhr) {
-                    $("#response").text(JSON.stringify(data, null, 4));
+                    $("#response").text(JSON.stringify(data.responseJSON, null, 4));
                 });
         });
     });
