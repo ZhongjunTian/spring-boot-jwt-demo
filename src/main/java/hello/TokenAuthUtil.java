@@ -27,7 +27,7 @@ public class TokenAuthUtil {
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + JWT);
     }
 
-    public static String parseToken(HttpServletRequest request) {
+    public static String validateToken(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
         String username = null;
         if (token != null) {
