@@ -1,4 +1,4 @@
-package hello.jwt;
+package hello;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,7 +14,6 @@ public class TokenAuthUtil {
     static final String SECRET = "ThisIsASecret";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";
-    static final String USER_NAME = "sub";
 
     public static void addTokenToHeader(HttpServletResponse res, String username) {
         HashMap<String, Object> map = new HashMap<>();

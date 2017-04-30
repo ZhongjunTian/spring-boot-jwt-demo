@@ -1,4 +1,4 @@
-package hello.jwt;
+package hello;
 
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;

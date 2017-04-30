@@ -1,7 +1,5 @@
 package hello;
 
-import hello.jwt.JwtAuthenticationFilter;
-import hello.jwt.TokenAuthUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -37,18 +35,20 @@ public class Application {
         return registrationBean;
     }
 
-
-    public static final String LOGIN_PATH = "/login";
-    @PostMapping(LOGIN_PATH)
+    @PostMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response,
                                      @RequestBody final AccountCredentials credentials) throws IOException {
         //here we just have one hardcoded username=admin and password=admin
         //TODO add your own user validation code here
-        if("admin".equals(credentials.username)
-                && "admin".equals(credentials.password))
+        if(validCredentials(credentials))
             TokenAuthUtil.addTokenToHeader(response,credentials.username);
         else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
+    }
+
+    private boolean validCredentials(AccountCredentials credentials) {
+        return "admin".equals(credentials.username)
+                && "admin".equals(credentials.password);
     }
 
 
