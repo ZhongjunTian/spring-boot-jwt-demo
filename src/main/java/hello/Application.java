@@ -20,9 +20,14 @@ import java.io.IOException;
 @RestController
 public class Application {
 
-    @GetMapping("/demo")
+    @GetMapping("/protected")
     public @ResponseBody Object hellWorld() {
-        return "hello world";
+        return "protected api";
+    }
+
+    @GetMapping("/public")
+    public @ResponseBody Object free() {
+        return "public api";
     }
 
 
@@ -30,7 +35,7 @@ public class Application {
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
-        filter.setExcludeUrlPatterns("/*.html", "/", "/login");
+        filter.setExcludeUrlPatterns("/*.html", "/", "/login","/public");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
