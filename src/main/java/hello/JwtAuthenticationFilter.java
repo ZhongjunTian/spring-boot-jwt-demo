@@ -10,17 +10,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import static hello.JwtUtil.HEADER_STRING;
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    List<String> excludeUrlPatterns;
+    List<String> excludeUrlPatterns = new LinkedList<>();
     PathMatcher pathMatcher = new AntPathMatcher();
+
+    public JwtAuthenticationFilter(String... excludeUrlPatterns) {
+        this.excludeUrlPatterns.addAll(
+                Arrays.asList(excludeUrlPatterns));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            String username  = TokenAuthUtil.validateToken(request);
+            String token = request.getHeader(HEADER_STRING);
+            JwtUtil.validateToken(token);
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return;
@@ -34,7 +43,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
     }
 
-    public void setExcludeUrlPatterns(String... excludeUrlPatterns) {
-        this.excludeUrlPatterns = Arrays.asList(excludeUrlPatterns);
-    }
 }

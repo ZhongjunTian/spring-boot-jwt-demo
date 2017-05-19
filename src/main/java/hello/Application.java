@@ -6,9 +6,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static hello.JwtUtil.HEADER_STRING;
+import static hello.JwtUtil.TOKEN_PREFIX;
 
 /*
 	https://auth0.com/blog/securing-spring-boot-with-jwts/
@@ -34,20 +36,21 @@ public class Application {
     @Bean
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
-        filter.setExcludeUrlPatterns("/*.html", "/", "/login","/public");
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
+                "/*.html", "/", "/login","/public");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
 
     @PostMapping("/login")
-    public void login(HttpServletRequest request, HttpServletResponse response,
-                                     @RequestBody final AccountCredentials credentials) throws IOException {
+    public void login(HttpServletResponse response,
+                      @RequestBody final AccountCredentials credentials) throws IOException {
         //here we just have one hardcoded username=admin and password=admin
         //TODO add your own user validation code here
-        if(validCredentials(credentials))
-            TokenAuthUtil.addTokenToHeader(response,credentials.username);
-        else
+        if(validCredentials(credentials)) {
+            String jwt = JwtUtil.generateToken(credentials.username);
+            response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
+        }else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
     }
 
