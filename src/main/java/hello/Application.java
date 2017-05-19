@@ -27,12 +27,6 @@ public class Application {
         return "Hello World! This is a protected api";
     }
 
-    @GetMapping("/public")
-    public @ResponseBody Object free() {
-        return "Hello World! This is a public api";
-    }
-
-
     @Bean
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
