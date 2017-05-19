@@ -46,7 +46,7 @@
 
         $("#exampleServiceBtn").click(function(){
             $.ajax({
-                  url: '/demo',
+                  url: '/protected',
                   headers: {'Authorization': token},
                   method: 'GET'
                 }).always(function(data, status, xhr) {

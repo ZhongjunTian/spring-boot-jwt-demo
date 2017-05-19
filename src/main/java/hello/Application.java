@@ -24,12 +24,12 @@ public class Application {
 
     @GetMapping("/protected")
     public @ResponseBody Object hellWorld() {
-        return "protected api";
+        return "Hello World! This is a protected api";
     }
 
     @GetMapping("/public")
     public @ResponseBody Object free() {
-        return "public api";
+        return "Hello World! This is a public api";
     }
 
 
