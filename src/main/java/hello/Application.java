@@ -31,7 +31,7 @@ public class Application {
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
-                "/*.html", "/", "/login","/public");
+                "/*.html", "/", "/login");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
