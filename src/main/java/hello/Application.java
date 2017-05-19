@@ -27,15 +27,6 @@ public class Application {
         return "Hello World! This is a protected api";
     }
 
-    @Bean
-    public FilterRegistrationBean jwtFilter() {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
-                "/*.html", "/", "/login");
-        registrationBean.setFilter(filter);
-        return registrationBean;
-    }
-
     @PostMapping("/login")
     public void login(HttpServletResponse response,
                       @RequestBody final AccountCredentials credentials) throws IOException {
@@ -46,6 +37,16 @@ public class Application {
             response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
         }else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
+    }
+
+
+    @Bean
+    public FilterRegistrationBean jwtFilter() {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
+                "/*.html", "/", "/login");
+        registrationBean.setFilter(filter);
+        return registrationBean;
     }
 
     private boolean validCredentials(AccountCredentials credentials) {
