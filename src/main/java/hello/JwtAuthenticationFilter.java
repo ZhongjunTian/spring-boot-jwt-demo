@@ -16,12 +16,11 @@ import java.util.List;
 import static hello.JwtUtil.HEADER_STRING;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    List<String> excludeUrlPatterns = new LinkedList<>();
+    private final String protectUrlPattern;
     PathMatcher pathMatcher = new AntPathMatcher();
 
-    public JwtAuthenticationFilter(String... excludeUrlPatterns) {
-        this.excludeUrlPatterns.addAll(
-                Arrays.asList(excludeUrlPatterns));
+    public JwtAuthenticationFilter(String protectUrlPattern) {
+        this.protectUrlPattern = protectUrlPattern;
     }
 
     @Override
@@ -39,8 +38,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return excludeUrlPatterns.stream()
-                .anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
+        if(pathMatcher.match(protectUrlPattern, request.getServletPath())){
+            return false;
+        }else{
+            return true;
+        }
     }
 
 }

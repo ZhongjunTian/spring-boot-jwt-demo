@@ -22,7 +22,7 @@ import static hello.JwtUtil.TOKEN_PREFIX;
 @RestController
 public class Application {
 
-    @GetMapping("/protected")
+    @GetMapping("/api/protected")
     public @ResponseBody Object hellWorld() {
         return "Hello World! This is a protected api";
     }
@@ -44,7 +44,7 @@ public class Application {
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
-                "/*.html", "/", "/login");
+                "/api/**");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
