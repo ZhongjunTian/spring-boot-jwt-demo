@@ -78,7 +78,7 @@ Application.java JwtAuthenticationFilter.java 和 JwtUtil.java
 ```
 ####接着我们看一下JwtAuthenticationFilter.java
 这里我们继承了OncePerRequestFilter, 保证了用户请求任何资源都会运行这个doFilterInternal. 这里我们会从HTTP Header里面截取JWT, 并且验证JWT的签名和过期时间, 如果有问题, 我们会返回HTTP 401错误. 
-PS: 源代码还有一个excludeUrls变量，让用户访问/login 或者 /index.html的时候并不需要JWT.
+PS: 源代码还有一个protectUrlPattern变量, 只有符合这个模板的URL才会被保护.
 完整版[JwtAuthenticationFilter.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/JwtAuthenticationFilter.java)
 ```
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
