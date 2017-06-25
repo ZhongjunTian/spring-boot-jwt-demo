@@ -43,8 +43,8 @@ public class JwtUtil {
                         .setSigningKey(SECRET)
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
-                String username = (String) body.get(USER_ID);
-                return new CustomHttpServletRequest(request, EncryptUtil.decrypt(username));
+                String userId = (String) body.get(USER_ID);
+                return new CustomHttpServletRequest(request, EncryptUtil.decrypt(userId));
             } catch (Exception e) {
                 logger.info(e.getMessage());
                 throw new TokenValidationException(e.getMessage());
