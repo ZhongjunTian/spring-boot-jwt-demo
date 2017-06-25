@@ -8,8 +8,8 @@ public class EncryptUtil {
     public static final String ISO_8859_1 = "ISO-8859-1";
     public static final String UTF_8 = "UTF-8";
     public static final char PADDING_CHAR = '\0';
-    static String IV = "1234567890aaaaaa";
-    static String encryptionKey = "1234567890aaaaaa";
+    static String IV = "abababababababab";
+    static String encryptionKey = "abcdef0123456789";
 
     public static String encrypt(String plainText) throws Exception {
         plainText = padding(plainText);
