@@ -22,24 +22,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         try {
-            String token = request.getHeader(HEADER_STRING);
-            JwtUtil.validateToken(token);
+            if(pathMatcher.match(protectUrlPattern, request.getServletPath())) {
+                String token = request.getHeader(HEADER_STRING);
+                JwtUtil.validateToken(token);
+            }
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return;
         }
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        if(pathMatcher.match(protectUrlPattern, request.getServletPath())){
-            return false;//should filter when match
-        }else{
-            return true;
-        }
     }
 
 }

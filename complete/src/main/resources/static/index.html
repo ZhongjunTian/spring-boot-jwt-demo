@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JWT Spring Security Demo</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.2.js"></script>
+
+    <script>
+    $.ajaxSetup({
+      contentType: "application/json; charset=utf-8"
+    });
+    var token = "";
+    $(document).ready(function(){
+        $("#btn-login").click(function(){
+            var data = {username: $("#username").val(), password: $("#password").val()};
+
+            $.ajax({
+                  url: '/login',
+                  method: 'POST',
+                  data:JSON.stringify(data)
+                }).always(function(data, status, xhr) {
+                    if(status == "success"){
+                        token = xhr.getResponseHeader("Authorization");
+                        $("#login").hide();
+                        $("#logout").show();
+                        $("#notLoggedIn").hide();
+                        $("#loggedIn").show();
+                    }else{
+                        $("#response").text(JSON.stringify(data, null, 4));
+                    }
+             });
+        });
+
+
+        $("#btn-logout").click(function(){
+            token = "";
+            $("#login").show();
+            $("#logout").hide();
+            $("#notLoggedIn").show();
+            $("#loggedIn").hide();
+        });
+
+        $("#exampleServiceBtn").click(function(){
+            $.ajax({
+                  url: '/api/protected',
+                  headers: {'Authorization': token},
+                  method: 'GET'
+                }).always(function(data, status, xhr) {
+                    if(data.responseJSON)
+                        $("#response").text(JSON.stringify(data.responseJSON, null, 4));
+                    else
+                        $("#response").text(JSON.stringify(data));
+                });
+        });
+    });
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Spring Boot JWT Demo</h1>
+
+    <div class="alert alert-danger" style="display:visible" id="notLoggedIn">Not logged in!</div>
+
+    <div class="alert alert-info" style="display:none" id="loggedIn">Logged in</div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default" id="login">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Login</h3>
+                </div>
+                <div class="panel-body">
+                    <input type="text" class="form-control" id="username" value="admin"
+                           required>
+                    <input type="password" class="form-control" id="password" value="admin"
+                           required>
+                    <button id="btn-login" class="btn btn-default">login</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <button type="button" class="btn btn-default" id="exampleServiceBtn" style="margin-bottom: 16px;">
+                call example service
+            </button>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Response:</h3>
+                </div>
+                <div class="panel-body">
+                    <pre id="response"></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+        </div>
+
+        <div class="col-md-6">
+        <div id="logout" style="display:none">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Authenticated user</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="userInfoBody"></div>
+                    <button id="btn-logout" type="button" class="btn btn-default">logout</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
