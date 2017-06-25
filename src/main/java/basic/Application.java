@@ -1,4 +1,4 @@
-package hello;
+package basic;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static hello.JwtUtil.HEADER_STRING;
-import static hello.JwtUtil.TOKEN_PREFIX;
+import static basic.JwtUtil.HEADER_STRING;
+import static basic.JwtUtil.TOKEN_PREFIX;
 
 /*
 	https://auth0.com/blog/securing-spring-boot-with-jwts/

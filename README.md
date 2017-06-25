@@ -5,7 +5,7 @@ Simple demo with only 3 classes
 ######通常情况下, 将api直接暴露出来是非常危险的. 每一个api呼叫, 用户都应该附上额外的信息, 以供我们认证和授权. 而JWT是一种既能满足这样需求, 而又简单安全便捷的方法. 前端login获取JWT之后, 只需在每一次HTTP呼叫的时候添加上JWT作为HTTP Header即可.
 本文将用不到100行Java代码, 教你如何在Spring Boot里面用JWT保护RESTful api.
 
-源代码在 [https://github.com/ZhongjunTian/spring-boot-jwt-demo](https://github.com/ZhongjunTian/spring-boot-jwt-demo/tree/master/src/main/java/hello)
+源代码在 [https://github.com/ZhongjunTian/spring-boot-jwt-demo](https://github.com/ZhongjunTian/spring-boot-jwt-demo/tree/master/src/main/java/basic)
 打开在线demo网站[jontian.com:8080](http://jontian.com:8080) 或者代码运行之后打开[localhost:8080](http://localhost:8080), 
 未登录之前点击 **Call Example Service** 返回 401 Unaothorized 错误. 
 ![登录前](http://upload-images.jianshu.io/upload_images/6110329-aaafc0cfeb9d297c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -66,7 +66,7 @@ Application.java JwtAuthenticationFilter.java 和 JwtUtil.java
 ```
 最后我们再注册一个Bean, 这个JwtAuthenticationFilter继承了OncePerRequestFilter, 任何请求都会经过我们的JwtAuthenticationFilter, 我们会在filter里面验证JWT的令牌(token).
 而入参`"/*.html", "/", "/login"`是这里的排除条件, 当用户访问我们的index.html或者/login的时候并不需要令牌.
-完整版[Application.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/hello/Application.java)
+完整版[Application.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/basic/Application.java)
 ```
 @Bean
     public FilterRegistrationBean jwtFilter() {
@@ -79,7 +79,7 @@ Application.java JwtAuthenticationFilter.java 和 JwtUtil.java
 ####接着我们看一下JwtAuthenticationFilter.java
 这里我们继承了OncePerRequestFilter, 保证了用户请求任何资源都会运行这个doFilterInternal. 这里我们会从HTTP Header里面截取JWT, 并且验证JWT的签名和过期时间, 如果有问题, 我们会返回HTTP 401错误. 
 PS: 源代码还有一个excludeUrls变量，让用户访问/login 或者 /index.html的时候并不需要JWT.
-完整版[JwtAuthenticationFilter.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/hello/JwtAuthenticationFilter.java)
+完整版[JwtAuthenticationFilter.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/basic/JwtAuthenticationFilter.java)
 ```
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
      //......一些不重要的代码......
@@ -102,7 +102,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 ` public static String generateToken(String username) `
 第二个函数是验证JWT是否有效, 如果JWT有效则返回用户名, 某种 throws Exception
 ` public static String validateToken(String token) `
-完整版[JwtUtil.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/hello/JwtUtil.java)
+完整版[JwtUtil.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/src/main/java/basic/JwtUtil.java)
 
 有什么需要补充的 欢迎留言
 以上
