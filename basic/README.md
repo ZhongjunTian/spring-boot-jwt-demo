@@ -1,11 +1,8 @@
-# spring-boot-jwt-demo
-Simple demo with only 3 classes
-
 
 ######通常情况下, 将api直接暴露出来是非常危险的. 每一个api呼叫, 用户都应该附上额外的信息, 以供我们认证和授权. 而JWT是一种既能满足这样需求, 而又简单安全便捷的方法. 前端login获取JWT之后, 只需在每一次HTTP呼叫的时候添加上JWT作为HTTP Header即可.
 本文将用不到100行Java代码, 教你如何在Spring Boot里面用JWT保护RESTful api.
 
-源代码在 [https://github.com/ZhongjunTian/spring-boot-jwt-demo](https://github.com/ZhongjunTian/spring-boot-jwt-demo/tree/master/basic/src/main/java/basic)
+源代码在 [https://github.com/ZhongjunTian/spring-boot-jwt-demo/basic](https://github.com/ZhongjunTian/spring-boot-jwt-demo/tree/master/basic/src/main/java/basic)
 打开在线demo网站[jontian.com:8080](http://jontian.com:8080) 或者代码运行之后打开[localhost:8080](http://localhost:8080), 
 未登录之前点击 **Call Example Service** 返回 401 Unaothorized 错误. 
 ![登录前](http://upload-images.jianshu.io/upload_images/6110329-aaafc0cfeb9d297c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -106,5 +103,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 ` public static String validateToken(String token) `
 完整版[JwtUtil.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/JwtUtil.java)
 
+ [Spring Boot用3个class轻松实现JWT (续集)  给JWT添加用户ID](http://www.jianshu.com/p/630dba262ab1)
 有什么需要补充的 欢迎留言
 以上

@@ -7,6 +7,7 @@
 
 授权的方法有很多种, 无非就是通过ID和Role来区分用户. 因为JWT的灵活性, 于是我们可以把用户ID放到jwt里面. 因为用户呼叫我们的api都会附带上JWT, 也就相当于直接附带上了用户ID.
 
+###将加密后的ID放进jwt
 当然实现起来也很简单, 我们只需要在生成JWT之前, 用 key-value的形式添加进JWT的claims就行. 比如 `map.put("id","1"); map.put("role","admin");`. 我这里的demo就象征性的放了一个("userId", "admin")进去.
 
 当然我们不会傻乎乎的把id这么重要的信息暴露给用户, 于是我就加了个密.
@@ -28,8 +29,17 @@ public static String generateToken(String userId) {
 ```
 {"alg":"HS512"}{"exp":1498430679,"userId":"õsXÂ±ÅÌÓïÏ\u000BÊm"}bs헂gҝ}KD辋-숔%ﻊ꙽v&<┮D̏0牶gړZ랬ǉqɻ䠄㌀
 ```
-
-当我们验证JWT的时候就顺便把id给提出来,解密之后我直接简单粗暴的把数据强行塞进了HttpServletRequest. 这样能让RestController更简单粗暴的使用这个ID.
+###将解密后的ID放进header
+JWT里面的ID或者Role信息使用起来非常不方便, 但是我们可以在验证jwt的同时,把解密后的ID或者Role放进请求的Header里面. 相当于添加了一个Header "userId"="admin"
+这样的话RestController里面使用这个Header很简单. 当成普通的header用就行. 验证JWT的代码已经帮你把脏活累活干完了.
+```
+    @GetMapping("/api/protected")
+    public @ResponseBody Object hellWorld(@RequestHeader(value = USER_ID) String userId) {
+        return "Hello World! This is a protected api, your use id is "+userId;
+    }
+```
+![](http://upload-images.jianshu.io/upload_images/6110329-336a41171ba7f0d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+解密之后我直接简单粗暴的把数据强行塞进了HttpServletRequest. 这样能让RestController更简单粗暴的使用这个ID. 
 ```
     public static HttpServletRequest validateTokenAndAddUserIdToHeader(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
@@ -41,6 +51,7 @@ public static String generateToken(String userId) {
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
                 String userId = (String) body.get(USER_ID);
+                //下面这行代码很关键， 通过CustomHttpServletRequest实现了修改Request
                 return new CustomHttpServletRequest(request, EncryptUtil.decrypt(userId));
             } 
             ... 一些不重要的代码 ...
@@ -50,17 +61,8 @@ public static String generateToken(String userId) {
     }
 ```
 
-RestController里面使用这个注入的Header很简单. 当成普通的header用就行. 验证JWT的代码已经帮你把脏活累活干完了.
-![](http://upload-images.jianshu.io/upload_images/6110329-336a41171ba7f0d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-```
-    @GetMapping("/api/protected")
-    public @ResponseBody Object hellWorld(@RequestHeader(value = USER_ID) String userId) {
-        return "Hello World! This is a protected api, your use id is "+userId;
-    }
-```
-
-
-把ID注入到HttpServletRquest的实现方法是继承HttpServletRequestWrapper, 重写getHeaders方法. 这样userId就成了一个header.
+###修改HttpServlet的方法:
+把ID注入到HttpServletRquest的实现方法是继承HttpServletRequestWrapper, 重写getHeaders方法. 这样userId就成了一个header. 
 ```
 public static class CustomHttpServletRequest extends HttpServletRequestWrapper {
         private String userId;
