@@ -23,13 +23,13 @@ public class Application {
     @GetMapping("/api/admin")
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     public @ResponseBody
-    Object admin(String userId) {
+    Object helloToAdmin(String userId) {
         return "Hello World! You are ADMIN ";
     }
 
     @GetMapping("/api/hello")
     public @ResponseBody
-    Object regular(String userId) {
+    Object hello(String userId) {
         return "Hello World! You have valid token";
     }
 
