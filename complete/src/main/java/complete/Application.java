@@ -15,7 +15,7 @@ import static complete.JwtUtil.USER_ID;
 
 
 /*
-	https://auth0.com/blog/securing-spring-boot-with-jwts/
+    https://auth0.com/blog/securing-spring-boot-with-jwts/
 	https://github.com/auth0-blog/spring-boot-jwts
 	https://github.com/szerhusenBC/jwt-spring-security-demo
 */
@@ -25,8 +25,9 @@ import static complete.JwtUtil.USER_ID;
 public class Application {
 
     @GetMapping("/api/protected")
-    public @ResponseBody Object hellWorld(@RequestHeader(value =USER_ID) String userId) {
-        return "Hello World! This is a protected api, your use id is "+userId;
+    public @ResponseBody
+    Object hellWorld(@RequestHeader(value = USER_ID) String userId) {
+        return "Your user id is '" + userId + "'";
     }
 
     @PostMapping("/login")
@@ -34,10 +35,10 @@ public class Application {
                       @RequestBody final AccountCredentials credentials) throws IOException {
         //here we just have one hardcoded username=admin and password=admin
         //TODO add your own user validation code here
-        if(validCredentials(credentials)) {
+        if (validCredentials(credentials)) {
             String jwt = JwtUtil.generateToken(credentials.username);
             response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
-        }else
+        } else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
     }
 
@@ -52,8 +53,8 @@ public class Application {
     }
 
     private boolean validCredentials(AccountCredentials credentials) {
-        if("admin".equals(credentials.username)
-                && "admin".equals(credentials.password)){
+        if ("admin".equals(credentials.username)
+                && "admin".equals(credentials.password)) {
             return true;//psudo company id;
         }
         return false;
@@ -64,6 +65,7 @@ public class Application {
         public String username;
         public String password;
     }
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

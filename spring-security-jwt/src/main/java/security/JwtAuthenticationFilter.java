@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 final String role = ((JwtUtil.CustomHttpServletRequest)request).getClaims().get(ROLE);
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(
-                                "1", null, Arrays.asList(() -> role)));
+                                null, null, Arrays.asList(() -> role)));
             }
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());

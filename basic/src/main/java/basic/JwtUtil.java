@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JwtUtil {
-    static final long EXPIRATION_TIME = 3600_000; // 1 hour
+    public static final long EXPIRATION_TIME = 3600_000_000L; // 1000 hour
     static final String SECRET = "ThisIsASecret";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";

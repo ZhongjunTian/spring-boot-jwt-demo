@@ -11,6 +11,7 @@
     <modules>
         <module>basic</module>
         <module>complete</module>
+        <module>spring-security-jwt</module>
     </modules>
 
 </project>

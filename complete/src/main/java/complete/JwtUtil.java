@@ -11,8 +11,8 @@ import java.util.*;
 
 public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-    public static final long EXPIRATION_TIME = 3600_000; // 1 hour
-    public static final String SECRET = "ThisIsASecret";
+    public static final long EXPIRATION_TIME = 3600_000_000L; // 1000 hour
+    public static final String SECRET = "ThisIsASecret";//please change to your own encryption secret.
     public static final String TOKEN_PREFIX = "Bearer";
     public static final String HEADER_STRING = "Authorization";
     public static final String USER_ID = "userId";
@@ -21,7 +21,7 @@ public class JwtUtil {
         HashMap<String, Object> map = new HashMap<>();
         //you can put any data in the map
         try {
-            map.put(USER_ID, EncryptUtil.encrypt(userId));
+            map.put(USER_ID, userId);
         } catch (Exception e) {
             logger.warn("Encryption failed. "+e.getMessage());
             throw new RuntimeException("Encryption failed");
@@ -44,7 +44,7 @@ public class JwtUtil {
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
                 String userId = (String) body.get(USER_ID);
-                return new CustomHttpServletRequest(request, EncryptUtil.decrypt(userId));
+                return new CustomHttpServletRequest(request, userId);
             } catch (Exception e) {
                 logger.info(e.getMessage());
                 throw new TokenValidationException(e.getMessage());
