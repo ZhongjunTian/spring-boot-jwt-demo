@@ -25,20 +25,15 @@ public class JwtUtil {
         return jwt;
     }
 
-    public static String validateToken(String token) {
-        if (token != null) {
+    public static void validateToken(String token) {
+        try {
             // parse the token.
-            Map<String,Object> body = Jwts.parser()
+            Map<String, Object> body = Jwts.parser()
                     .setSigningKey(SECRET)
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
-            String username = (String) (body.get("username"));
-            if(username == null || username.isEmpty())
-                throw new TokenValidationException("Wrong token without username");
-            else
-                return username;
-        }else{
-            throw new TokenValidationException("Missing token");
+        }catch (Exception e){
+            throw new IllegalStateException("Invalid Token. "+e.getMessage());
         }
     }
 
