@@ -19,7 +19,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 3600_000_000L))// 1000 hour
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return jwt;
+        return "Bearer "+jwt; //jwt前面一般都会加Bearer
     }
 
     public static void validateToken(String token) {
@@ -27,7 +27,7 @@ public class JwtUtil {
             // parse the token.
             Map<String, Object> body = Jwts.parser()
                     .setSigningKey(SECRET)
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(token.replace("Bearer ",""))
                     .getBody();
         }catch (Exception e){
             throw new IllegalStateException("Invalid Token. "+e.getMessage());
