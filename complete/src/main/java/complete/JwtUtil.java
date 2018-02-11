@@ -26,7 +26,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return "Bearer "+jwt;
+        return "Bearer "+jwt; //jwt前面一般都会加Bearer
     }
 
     public static HttpServletRequest validateTokenAndAddUserIdToHeader(HttpServletRequest request) {
