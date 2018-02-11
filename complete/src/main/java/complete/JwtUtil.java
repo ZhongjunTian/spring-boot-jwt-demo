@@ -13,7 +13,7 @@ public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     public static final long EXPIRATION_TIME = 3600_000_000L; // 1000 hour
     public static final String SECRET = "ThisIsASecret";//please change to your own encryption secret.
-    public static final String TOKEN_PREFIX = "Bearer";
+    public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
     public static final String USER_NAME = "userName";
 
@@ -26,7 +26,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return "Bearer "+jwt; //jwt前面一般都会加Bearer
+        return TOKEN_PREFIX+jwt; //jwt前面一般都会加Bearer
     }
 
     public static HttpServletRequest validateTokenAndAddUserIdToHeader(HttpServletRequest request) {
