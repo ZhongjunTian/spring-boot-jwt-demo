@@ -15,17 +15,12 @@ public class JwtUtil {
     public static final String SECRET = "ThisIsASecret";//please change to your own encryption secret.
     public static final String TOKEN_PREFIX = "Bearer";
     public static final String HEADER_STRING = "Authorization";
-    public static final String USER_ID = "userId";
+    public static final String USER_NAME = "userName";
 
     public static String generateToken(String userId) {
         HashMap<String, Object> map = new HashMap<>();
         //you can put any data in the map
-        try {
-            map.put(USER_ID, userId);
-        } catch (Exception e) {
-            logger.warn("Encryption failed. "+e.getMessage());
-            throw new RuntimeException("Encryption failed");
-        }
+        map.put(USER_NAME, userId);
         String jwt = Jwts.builder()
                 .setClaims(map)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -43,32 +38,35 @@ public class JwtUtil {
                         .setSigningKey(SECRET)
                         .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                         .getBody();
-                String userId = (String) body.get(USER_ID);
-                return new CustomHttpServletRequest(request, userId);
+                return new CustomHttpServletRequest(request, body);
             } catch (Exception e) {
                 logger.info(e.getMessage());
                 throw new TokenValidationException(e.getMessage());
             }
         } else {
-            logger.info("Missing token");
             throw new TokenValidationException("Missing token");
         }
     }
 
     public static class CustomHttpServletRequest extends HttpServletRequestWrapper {
-        private String userId;
+        private Map<String, String> claims;
 
-        public CustomHttpServletRequest(HttpServletRequest request, String userId) {
+        public CustomHttpServletRequest(HttpServletRequest request, Map<String, ?> claims) {
             super(request);
-            this.userId = userId;
+            this.claims = new HashMap<>();
+            claims.forEach((k, v) -> this.claims.put(k, String.valueOf(v)));
         }
 
         @Override
         public Enumeration<String> getHeaders(String name) {
-            if (name != null && (name.equals(USER_ID))) {
-                return Collections.enumeration(Arrays.asList(userId));
+            if (claims != null && claims.containsKey(name)) {
+                return Collections.enumeration(Arrays.asList(claims.get(name)));
             }
             return super.getHeaders(name);
+        }
+
+        public Map<String, String> getClaims() {
+            return claims;
         }
     }
 

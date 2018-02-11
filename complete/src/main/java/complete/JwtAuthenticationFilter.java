@@ -23,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            if(pathMatcher.match(protectUrlPattern, request.getServletPath())) {
+            if(isProtectedUrl(request)) {
                 request = JwtUtil.validateTokenAndAddUserIdToHeader(request);
             }
         } catch (Exception e) {
@@ -31,6 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isProtectedUrl(HttpServletRequest request) {
+        return pathMatcher.match(protectUrlPattern, request.getServletPath());
     }
 
 }
