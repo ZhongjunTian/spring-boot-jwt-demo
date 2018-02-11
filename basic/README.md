@@ -15,32 +15,32 @@
 废话少说, 我们先看看什么是JWT. JSON Web Token其实就是一个包含认证数据的JSON, 大概长这样子
 分三个部分, 
 第一部分`{"alg":"HS512"}`是签名算法 
-第二部分 `{"exp":1495176357,"username":"admin"}`是一些数据(你想放什么都可以), 这里有过期日期和用户
-第三部分`	')4'76-DM(H6fJ::$ca4~tI2%Xd-$nL(l`非常重要,是签名Signiture, 服务器会验证这个以防伪造. 因为JWT其实是明文传送, 任何人都能篡改里面的内容. 服务端通过验证签名, 而验证这个JWT是自己生成的.
+第二部分 `{"exp":1495176357,"username":"admin"}`是一些数据(你想放什么都可以), 这里有过期日期和用户名
+第三部分`	')4'76-DM(H6fJ::$ca4~tI2%Xd-$nL(l`非常重要,是签名Signiture, 服务器会验证这个以防伪造. 因为JWT其实是明文传送, 任何人都能篡改里面的内容. 服务端通过验证签名, 从而确定这个JWT是自己生成的.
 
 原理也不是很复杂, 我用一行代码就能表示出来
-首先我们将JWT第一第二部分的内容, 加上你的秘钥(key), 然后用某个算法(比如hash算法)求一下, 求得的内容就是你的签名. 验证的时候只需要验证你用JWT算出来的值是否等于JWT里面的签名. 
+首先我们将JWT第一第二部分的内容, 加上你的秘钥(key或者叫secret), 然后用某个算法(比如hash算法)求一下, 求得的内容就是你的签名. 验证的时候只需要验证你用JWT算出来的值是否等于JWT里面的签名. 
 因为别人没有你的key, 所以也就没法伪造签名. 
 ######简单粗暴一行代码解释什么是签名:
 ```
  int signiture = ("{alg:HS512}{exp:1495176357,username:admin}" + key).hashCode();
 ```
-######完整的JWT:
+######最后附上签名,得到完整的JWT:
 ```
 {"alg":"HS512"}{"exp":1495176357,"username":"admin"}	')4'76-DM(H6fJ::$ca4~tI2%Xd-$nL(l
 ```
-通常我们都是把JWT用base64编码之后放在http的header里面, 并且每一次呼叫api都附上这个JWT, 并且服务器每次也验证JWT是否过期
+为了方便复制和使用, 通常我们都是把JWT用base64编码之后放在http的header里面, 并且每一次呼叫api都附上这个JWT, 并且服务器每次也验证JWT是否过期
 ######通常我们用到的JWT:
 ```
-Base64编码后
-Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE0OTUxNzYzNTcsInVzZXJuYW1lIjoiYWRtaW4ifQ.mQtCfLKfI0J7c3HTYt7kRN4AcoixiUSDaZv2ZKOjq2JMZjBhf1DmE0Fn6PdEkyJZhYZJTMLaIPwyR-uu6BMKGw
+Base64编码后:
+eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE0OTUxNzYzNTcsInVzZXJuYW1lIjoiYWRtaW4ifQ.mQtCfLKfI0J7c3HTYt7kRN4AcoixiUSDaZv2ZKOjq2JMZjBhf1DmE0Fn6PdEkyJZhYZJTMLaIPwyR-uu6BMKGw
 ```
 
 ***
 #2. 三个class实现JWT
 整个demo一共有三个class
-security.Application.java security.JwtAuthenticationFilter.java 和 security.JwtUtil.java
-####首先我们看一看Application.java
+Application.java JwtAuthenticationFilter.java 和 JwtUtil.java
+####2.1首先我们看一看Application.java
 
 第一步创建一个hello world api
 ```
@@ -55,37 +55,43 @@ security.Application.java security.JwtAuthenticationFilter.java 和 security.Jwt
     public void login(HttpServletResponse response,
                       @RequestBody final AccountCredentials credentials) throws IOException {
         if(validCredentials(credentials)) {
-            String jwt = security.JwtUtil.generateToken(credentials.username);
+            String jwt = JwtUtil.generateToken(credentials.username);
             response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
         }else
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
     }
 ```
-最后我们再注册一个Bean, 这个JwtAuthenticationFilter继承了OncePerRequestFilter, 任何请求都会经过我们的JwtAuthenticationFilter, 我们会在filter里面验证JWT的令牌(token).
-而入参`"/*.html", "/", "/login"`是这里的排除条件, 当用户访问我们的index.html或者/login的时候并不需要令牌.
-完整版[security.Application.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/websecurity.Application.java)
+登录效果如下图
+
+![](http://upload-images.jianshu.io/upload_images/6110329-9744c21801eac7cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+
+最后我们再注册一个Bean, 通过这个Filter实现对每个Rest api请求都验证jwt的功能. 这个JwtAuthenticationFilter继承了OncePerRequestFilter, 任何请求都会经过我们的JwtAuthenticationFilter, 我们会在filter里面验证JWT的令牌(token).
+完整版[Application.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/Application.java)
 ```
-@Bean
+
+    @Bean
     public FilterRegistrationBean jwtFilter() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        security.JwtAuthenticationFilter filter = new security.JwtAuthenticationFilter("/*.html", "/", "/login");
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter("/api/**");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
 ```
-####接着我们看一下JwtAuthenticationFilter.java
+####2.2然后我们看一下JwtAuthenticationFilter.java
 这里我们继承了OncePerRequestFilter, 保证了用户请求任何资源都会运行这个doFilterInternal. 这里我们会从HTTP Header里面截取JWT, 并且验证JWT的签名和过期时间, 如果有问题, 我们会返回HTTP 401错误. 
 PS: 源代码还有一个protectUrlPattern变量, 只有符合这个模板的URL才会被保护.
-完整版[security.JwtAuthenticationFilter.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/websecurity.JwtAuthenticationFilter.java)
+完整版[JwtAuthenticationFilter.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/JwtAuthenticationFilter.java)
 ```
-public class security.JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
      //......一些不重要的代码......
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
        try {
            if(pathMatcher.match(protectUrlPattern, request.getServletPath())) {
                String token = request.getHeader(HEADER_STRING);
-               security.JwtUtil.validateToken(token);
+               JwtUtil.validateToken(token);
            }
        } catch (Exception e) {
            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
@@ -96,12 +102,19 @@ public class security.JwtAuthenticationFilter extends OncePerRequestFilter {
     //......一些不重要的代码......
 }
 ```
-####最后我们看一下JwtUtil.java
+
+####2.3最后我们看一下JwtUtil.java
 这里就两个函数, 第一个输入是用户名, 返回一个有效期3600秒的JWT
 ` public static String generateToken(String username) `
 第二个函数是验证JWT是否有效, 如果JWT有效则返回用户名, 某种 throws Exception
 ` public static String validateToken(String token) `
-完整版[security.JwtUtil.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/websecurity.JwtUtil.java)
+完整版[JwtUtil.java](https://github.com/ZhongjunTian/spring-boot-jwt-demo/blob/master/basic/src/main/java/basic/JwtUtil.java)
+
+#3.测试
+这就是呼叫api的效果
+
+![正确jwt](http://upload-images.jianshu.io/upload_images/6110329-f176ac5b7b1a90c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![错误jwt](http://upload-images.jianshu.io/upload_images/6110329-3d71dc62e373f705.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
  [Spring Boot用3个class轻松实现JWT (续集)  给JWT添加用户ID](http://www.jianshu.com/p/630dba262ab1)
 有什么需要补充的 欢迎留言

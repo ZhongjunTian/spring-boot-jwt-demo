@@ -4,13 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 
-import static basic.JwtUtil.HEADER_STRING;
-import static basic.JwtUtil.TOKEN_PREFIX;
 
 /*
 	https://auth0.com/blog/securing-spring-boot-with-jwts/
@@ -28,37 +29,38 @@ public class Application {
     }
 
     @PostMapping("/login")
-    public void login(HttpServletResponse response,
-                      @RequestBody final AccountCredentials credentials) throws IOException {
-        //here we just have one hardcoded username=admin and password=admin
-        //TODO add your own user validation code here
-        if(validCredentials(credentials)) {
-            String jwt = JwtUtil.generateToken(credentials.username);
-            response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
-        }else
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
+    public Object login(HttpServletResponse response, @RequestBody final Account account) throws IOException {
+        if(isValidPassword(account)) {
+            String jwt = JwtUtil.generateToken(account.username);
+            return new HashMap<String,String>(){{
+                put("token", jwt);
+            }};
+        }else {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
     }
-
 
     @Bean
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        //我们只对/api 开始的api检查jwt, 这里是为了让login能正常工作, 否则login也需要jwt
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
                 "/api/**");
         registrationBean.setFilter(filter);
         return registrationBean;
     }
 
-    private boolean validCredentials(AccountCredentials credentials) {
-        return "admin".equals(credentials.username)
-                && "admin".equals(credentials.password);
+    private boolean isValidPassword(Account ac) {
+        return "admin".equals(ac.username)
+                && "admin".equals(ac.password);
     }
 
 
-    public static class AccountCredentials {
+    public static class Account {
         public String username;
         public String password;
     }
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

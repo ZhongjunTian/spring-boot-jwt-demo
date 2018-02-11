@@ -24,7 +24,7 @@
                   data:JSON.stringify(data)
                 }).always(function(data, status, xhr) {
                     if(status == "success"){
-                        token = xhr.getResponseHeader("Authorization");
+                        token = data.token;
                         $("#login").hide();
                         $("#logout").show();
                         $("#notLoggedIn").hide();
