@@ -43,9 +43,7 @@ public class Application {
     @Bean
     public FilterRegistrationBean jwtFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        //我们只对/api 开始的api检查jwt, 这里是为了让login能正常工作, 否则login也需要jwt
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
-                "/api/**");
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         registrationBean.setFilter(filter);
         return registrationBean;
     }

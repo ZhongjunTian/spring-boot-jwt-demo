@@ -30,7 +30,7 @@ public class JwtUtil {
         return TOKEN_PREFIX + " " + jwt;
     }
 
-    public static CustomHttpServletRequest validateTokenAndAddUserIdToHeader(HttpServletRequest request) {
+    public static Map<String, Object> validateTokenAndGetClaims(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
         if (token == null)
             throw new TokenValidationException("Missing token");
@@ -39,30 +39,7 @@ public class JwtUtil {
                 .setSigningKey(SECRET)
                 .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                 .getBody();
-
-        return new CustomHttpServletRequest(request, body);
-    }
-
-    public static class CustomHttpServletRequest extends HttpServletRequestWrapper {
-        private Map<String, String> claims;
-
-        public CustomHttpServletRequest(HttpServletRequest request, Map<String, ?> claims) {
-            super(request);
-            this.claims = new HashMap<>();
-            claims.forEach((k, v) -> this.claims.put(k, String.valueOf(v)));
-        }
-
-        @Override
-        public Enumeration<String> getHeaders(String name) {
-            if (claims != null && claims.containsKey(name)) {
-                return Collections.enumeration(Arrays.asList(claims.get(name)));
-            }
-            return super.getHeaders(name);
-        }
-
-        public Map<String, String> getClaims() {
-            return claims;
-        }
+        return body;
     }
 
     static class TokenValidationException extends RuntimeException {

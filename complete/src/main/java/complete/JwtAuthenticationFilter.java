@@ -12,12 +12,8 @@ import java.io.IOException;
 
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final String protectUrlPattern;
     private static final PathMatcher pathMatcher = new AntPathMatcher();
 
-    public JwtAuthenticationFilter(String protectUrlPattern) {
-        this.protectUrlPattern = protectUrlPattern;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isProtectedUrl(HttpServletRequest request) {
-        return pathMatcher.match(protectUrlPattern, request.getServletPath());
+        return pathMatcher.match("/api/**", request.getServletPath());
     }
 
 }

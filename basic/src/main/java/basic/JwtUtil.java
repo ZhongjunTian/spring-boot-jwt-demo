@@ -19,7 +19,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 3600_000_000L))// 1000 hour
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return jwt;
+        return "Bearer "+jwt;
     }
 
     public static void validateToken(String token) {

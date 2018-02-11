@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 
 import static security.JwtUtil.ROLE;
 
@@ -23,17 +24,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter() {
     }
 
-    public JwtAuthenticationFilter(String protectUrlPattern) {
-        this.protectUrlPattern = protectUrlPattern;
-    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
             if (isProtectedUrl(request)) {
-                request = JwtUtil.validateTokenAndAddUserIdToHeader(request);
-                final String role = ((JwtUtil.CustomHttpServletRequest)request).getClaims().get(ROLE);
+                Map<String, Object> claims = JwtUtil.validateTokenAndGetClaims(request);
+                String role = String.valueOf(claims.get(ROLE));
+                //最关键的部分就是这里, 我们直接注入了
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(
                                 null, null, Arrays.asList(() -> role)));

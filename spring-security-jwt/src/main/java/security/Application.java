@@ -2,11 +2,14 @@ package security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 
@@ -34,28 +37,30 @@ public class Application {
     }
 
     @PostMapping("/login")
-    public void login(HttpServletResponse response,
-                      @RequestBody AccountCredentials credentials) throws IOException {
-        if (isValidPassword(credentials)) {
-            String role = credentials.username.equals("admin") ? "ADMIN_USER" : "REGULAR_USER";
-            response.addHeader(JwtUtil.HEADER_STRING, JwtUtil.generateToken(role));
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Wrong credentials");
+    public Object login(HttpServletResponse response,
+                      @RequestBody Account account) throws IOException {
+        if(isValidPassword(account)) {
+            String jwt = JwtUtil.generateToken(account.username);
+            return new HashMap<String,String>(){{
+                put("token", jwt);
+            }};
+        }else {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
 
 
-    private boolean isValidPassword(AccountCredentials cr) {
+    private boolean isValidPassword(Account ac) {
         //we just have 2 hardcoded user
-        if ("admin".equals(cr.username) && "admin".equals(cr.password)
-                || "user".equals(cr.username) && "user".equals(cr.password)) {
+        if ("admin".equals(ac.username) && "admin".equals(ac.password)
+                || "user".equals(ac.username) && "user".equals(ac.password)) {
             return true;
         }
         return false;
     }
 
 
-    public static class AccountCredentials {
+    public static class Account {
         public String username;
         public String password;
     }

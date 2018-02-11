@@ -12,12 +12,7 @@ import java.io.IOException;
 
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final String protectUrlPattern;
     private static final PathMatcher pathMatcher = new AntPathMatcher();
-
-    public JwtAuthenticationFilter(String protectUrlPattern) {
-        this.protectUrlPattern = protectUrlPattern;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -35,8 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+
+    //我们只对地址 /api 开头的api检查jwt. 不然的话登录/login也需要jwt
     private boolean isProtectedUrl(HttpServletRequest request) {
-        return pathMatcher.match(protectUrlPattern, request.getServletPath());
+        return pathMatcher.match("/api/**", request.getServletPath());
     }
 
 }
